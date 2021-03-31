@@ -1,92 +1,122 @@
-import React from 'react';
-// import * as sortingAlgorithms from './sortingAlgorithms/sortingAlgorithms';
-import * as sortingAlgorithms from '../sortingAlgorithms/sortingAlgo.js'
-import './SortingVisualizer.css';
-export default class SortingVisualizer extends React.Component {
-    constructor(props) {
-        super(props);
-        
-        this.state = {
-        array:[],
-        };
-    }
-    
-    componentDidMount() {
-    this.resetArray();
-}
-    resetArray() {
-    const array = [];
-    for (let i = 0; i < 400; i++) {
-        array.push(randomIntFromInterval(5, 690));
-    }
-    this.setState({ array });
-    }
-    mergeSort()
-    {
-        const javaScriptSortedArray = this.state.array.slice()
-            .sort((a, b) => a - b);
-        const sortedArray = sortingAlgorithms.mergeSort(this.state.array);
-        console.log(arraysAreEqual(javaScriptSortedArray, sortedArray));
-    }
-    quickSort()
-    {
-        const javaScriptSortedArray = this.state.array.slice()
-            .sort((a, b) => a - b);
-        const sortedArray = sortingAlgorithms.quickSort(this.state.array);
-        console.log(arraysAreEqual(javaScriptSortedArray, sortedArray));
-    }
-    heapSort()
-    {
+import React, { Component } from "react";
+// .. COMPONENTS .. //
+import Header from "./Components/Header/Header.jsx";
+import ButtonsBar from "./Components/ButtonsBar/ButtonsBar.jsx";
+import ArrayBar from "./Components/ArrayBar/ArrayBar.jsx";
+import RangeSlider from "./Components/RangeSliders/RangeSlider.jsx";
+// .. HELPER FUNCTIONS .. //
+import { randomIntFromInterval, playAudio } from "./HelperFunctions.js";
+// .. ALGORITHMS .. //
+import BubbleSort from "./SortingAlgorithms/BubbleSort/BubbleSort.js";
+import SelectionSort from "./SortingAlgorithms/SelectionSort/SelectionSort.js";
+import InsertionSort from "./SortingAlgorithms/InsertionSort/InsertionSort.js";
+// .. STYLE .. //
+import "./SortingVisualizer.css";
+// .. SOUNDS .. //
+import ResetEffect from "./sounds/ResetEffect.mp3";
 
+export default class SortingVisualizer extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      //  // ##
+      //        Initializing in state because:
+      //         1. It might be changed later by the user.
+      //         2. The change value must be re-rendered.
+      // ## //
+      array: [],
+      animationSpeed: 50,
+      numberOfArrayBars: 10,
+    };
+
+    this.generateNewArray = this.generateNewArray.bind(this);
+    this.bubbleSort = this.bubbleSort.bind(this);
+    this.selectionSort = this.selectionSort.bind(this);
+    this.insertionSort = this.insertionSort.bind(this);
+    this.onChangeArrayBarRangeSlider = this.onChangeArrayBarRangeSlider.bind(
+      this
+    );
+    this.onChangeAnimationSpeedRangeSlider = this.onChangeAnimationSpeedRangeSlider.bind(
+      this
+    );
+  }
+
+  // ## This function generates the array before the page is rendere. ## //
+  componentDidMount() {
+    this.generateNewArray();
+  }
+
+  // ## This function generates new random array of size "numberOfArrayBars". ## //
+  generateNewArray() {
+    const array = [];
+    for (let i = 0; i < this.state.numberOfArrayBars; i++) {
+      // ## Generates an element between 5 and 70, and pushes it into the array. ## //
+      array.push(randomIntFromInterval(5, 70));
     }
-    bubbleSort()
-    {
-        const javaScriptSortedArray = this.state.array.slice()
-            .sort((a, b) => a - b);
-        const sortedArray = sortingAlgorithms.bubbleSort(this.state.array);
-        console.log(arraysAreEqual(javaScriptSortedArray, sortedArray));
-    }
-    testSortingAlgorithms() {
-        for (let i = 0; i < 100; i++)
-        {
-            const array=[];
-            const length = randomIntFromInterval(1, 1000);
-            for (let j = 0; j < length; j++) {
-                array.push(randomIntFromInterval(-1000, 1000));
-            }
-            const javaScriptSortedArray = array.slice().sort((a, b) => a - b);
-            const sortedArray = sortingAlgorithms.bubbleSort(array.slice());
-            console.log(arraysAreEqual(javaScriptSortedArray, sortedArray));
-        }
-    }
-    render() {
-        const { array } = this.state;
-        return (
-            <div className="array-container">
-                {array.map((value, idx) => (
-                    <div className="array-bar" key={idx} style={{height:`${value}px`}}></div>
-                ))}
-                <button onClick={() => this.resetArray()} id="button">Generate New Array</button>
-                <button onClick={() => this.mergeSort()} id="button">Merge Sort</button>
-                <button onClick={() => this.quickSort()} id="button">Quick Sort</button>
-                <button onClick={() => this.heapSort()} id="button">Heap Sort</button>
-                <button onClick={() => this.bubbleSort()} id="button">Bubble Sort</button>
-                <button onClick={() => this.testSortingAlgorithms()} id="button">Test
-                </button> 
-                
-            </div>
-        );
-    }
-}
-function randomIntFromInterval(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-    
-}
-function arraysAreEqual(arrayOne, arrayTwo)
-{
-    if (arrayOne.length !== arrayTwo.length) return false;
-    for (let i = 0; i < arrayOne.length; i++) {
-        if (arrayOne[i] !== arrayTwo[i]) return false;
-    }
-    return true;
+    playAudio(ResetEffect);
+    this.setState({ array: array });
+  }
+
+  // ******************************************************************************* //
+
+  // ## Handles if the "Array Size" slider is changed. ## //
+  onChangeArrayBarRangeSlider = (event, value) => {
+    this.setState({ numberOfArrayBars: value });
+    this.generateNewArray();
+  };
+
+  // ## Handles if the "Animation Speed" slider is changed. ## //
+  onChangeAnimationSpeedRangeSlider = (event, value) => {
+    this.setState({ animationSpeed: value });
+  };
+
+  // ******************************************************************************* //
+
+  // ## Calls the BubbleSort component/function. ## //
+  bubbleSort = () => {
+    BubbleSort(this.state.array, this.state.animationSpeed);
+  };
+
+  // ## Calls the SelectionSort component/function. ## //
+  selectionSort = () => {
+    SelectionSort(this.state.array, this.state.animationSpeed);
+  };
+
+  // ## Calls the InsertionSort component/function. ## //
+  insertionSort = () => {
+    InsertionSort(this.state.array, this.state.animationSpeed);
+  };
+
+  // ******************************************************************************* //
+
+  render() {
+    return (
+      <div className="main-container">
+        {/* --------------------- HEADER : 8% Height --------------------- */}
+        <Header />
+
+        {/* --------------------- BUTTONS : 10% Height --------------------- */}
+        <ButtonsBar
+          generateNewArray={this.generateNewArray}
+          bubbleSort={this.bubbleSort}
+          selectionSort={this.selectionSort}
+          insertionSort={this.insertionSort}
+        />
+
+        {/* --------------------- BARS : 74% Height --------------------- */}
+        <ArrayBar array={this.state.array} />
+
+        {/* --------------------- SLIDERS : 8% Height --------------------- */}
+        <RangeSlider
+          numberOfArrayBars={this.state.numberOfArrayBars}
+          animationSpeed={this.state.animationSpeed}
+          onChangeArrayBarRangeSlider={this.onChangeArrayBarRangeSlider}
+          onChangeAnimationSpeedRangeSlider={
+            this.onChangeAnimationSpeedRangeSlider
+          }
+        />
+      </div>
+    );
+  }
 }
