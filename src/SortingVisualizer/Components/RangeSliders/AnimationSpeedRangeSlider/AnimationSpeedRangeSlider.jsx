@@ -44,7 +44,7 @@ export default class AnimationSpeedRangeSlider extends Component {
         <p id="text-animation-speed">Animation Speed (ms)</p>
         <AnimationSpeedSlider
           id="animationSpeedSlider"
-          min={10}
+          min={1}
           max={200}
           defaultValue={this.state.animationSpeed}
           valueLabelDisplay="auto"

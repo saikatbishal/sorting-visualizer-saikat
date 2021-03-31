@@ -31,6 +31,13 @@ export default class ButtonsBar extends Component {
         >
           Insertion Sort
         </button>
+        <button
+          id="heapSortButton"
+          onClick={() => this.props.insertionSort()}
+          className="buttonStyle1"
+        >
+          Heap Sort
+        </button>
       </div>
     );
   }

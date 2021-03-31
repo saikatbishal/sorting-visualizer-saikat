@@ -44,7 +44,7 @@ export default class ArrayBarRangeSlider extends Component {
         <ArrayBarSlider
           id="arrayBarSlider"
           min={2}
-          max={14}
+          max={30}
           step={1}
           defaultValue={this.state.numberOfArrayBars}
           valueLabelDisplay="auto"
